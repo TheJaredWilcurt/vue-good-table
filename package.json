@@ -1,25 +1,25 @@
 {
   "name": "vue-good-table",
-  "version": "2.14.1",
-  "sideEffects": false,
+  "version": "2.18.1",
+  "sideEffects": [
+    "*.vue",
+    "*.css"
+  ],
   "description": "A simple, clean data table for VueJS (2.x) with essential features like sorting, column filtering, pagination etc",
   "main": "dist/vue-good-table.cjs.js",
-  "module": "dist/vue-good-table.es.js",
+  "module": "dist/vue-good-table.esm.js",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
     "bundle": "bili",
-    "dev": "poi",
+    "dev": "poi --serve",
     "docs:dev": "vuepress dev vp-docs",
     "docs:build": "vuepress build vp-docs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No test specified\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/xaksis/vue-good-table"
-  },
+  "repository": "github:xaksis/vue-good-table",
   "keywords": [
     "vue",
     "vuejs",
@@ -33,30 +33,33 @@
   "license": "MIT",
   "poi": {
     "entry": "dev/main.js",
-    "dist": "dev/dist",
-    "homepage": "./",
-    "html": {
-      "template": "dev/index.html"
+    "output": {
+      "dir": "dev/dist",
+      "publicUrl": "./",
+      "html": {
+        "template": "dev/index.html"
+      }
     }
   },
   "dependencies": {
-    "date-fns": "2.0.0-alpha.7",
+    "date-fns": "^2.0.0-beta.4",
     "diacriticless": "1.0.1",
     "lodash.assign": "^4.2.0",
-    "lodash.clone": "^4.5.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.filter": "^4.6.0",
-    "lodash.foreach": "^4.5.0"
+    "lodash.foreach": "^4.5.0",
+    "lodash.isequal": "^4.5.0"
   },
   "devDependencies": {
-    "bili": "^3.1.2",
-    "node-sass": "^4.9.0",
-    "poi": "^10.1.6",
-    "rollup-plugin-vue": "^3.0.0",
-    "sass-loader": "^6.0.6",
-    "vue": "^2.5.16",
-    "vue-template-compiler": "^2.5.16",
-    "vuepress": "^0.10.1",
-    "webpack": "^4.8.3"
+    "@vuepress/plugin-google-analytics": "^1.0.0-rc.1",
+    "bili": "^4.8.0",
+    "node-sass": "^4.12.0",
+    "poi": "^12.7.0",
+    "rollup-plugin-commonjs": "^10.0.1",
+    "rollup-plugin-vue": "^5.0.1",
+    "sass-loader": "^7.1.0",
+    "vue": "^2.6.10",
+    "vue-template-compiler": "^2.6.10",
+    "vuepress": "^1.0.0-rc.1"
   }
 }

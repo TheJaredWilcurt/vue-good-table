@@ -6,7 +6,7 @@ Vue-good-table's in-built features like sorting, paging, filtering etc. are all 
 
 When remote mode is on, vue-good-table does not perform sorting, paging, filtering etc. on the client side but instead emits events that we can use to then send proper parameters to the back-end. The server then is expected to send the correct rows to display on the UI. 
 
-Following is a workflow you can use to get a server powered vue-good-table instace: 
+Following is a workflow you can use to get a server powered vue-good-table instance: 
 
 ## Prep Work
 ### What do we send to server?
@@ -18,10 +18,12 @@ serverParams: {
   // a map of column filters example: {name: 'john', age: '20'}
   columnFilters: {
   },
-  sort: {
-    field: '', // example: 'name'
-    type: '' // 'asc' or 'desc'
-  },
+  sort: [
+    {
+      field: '', // example: 'name'
+      type: '' // 'asc' or 'desc'
+    }
+  ],
 
   page: 1, // what page I want to show
   perPage: 10 // how many items I'm showing per page
@@ -39,7 +41,7 @@ Two things are required for the server to send back
 ```html
 <vue-good-table
   mode="remote"
-  pagination-options="{
+  :pagination-options="{
     enabled: true,
   }"
   :totalRows="totalRecords"
@@ -59,7 +61,8 @@ Now instead of doing the above client side, each user interaction will generate 
   @on-column-filter="onColumnFilter"
   @on-per-page-change="onPerPageChange"
   :totalRows="totalRecords"
-  pagination-options="{
+  :isLoading.sync="isLoading"
+  :pagination-options="{
     enabled: true,
   }"
   :rows="rows"
@@ -70,6 +73,7 @@ Now instead of doing the above client side, each user interaction will generate 
 ```javascript
 data() {
   return {
+    isLoading: false,
     columns: [
       //...
     ],
@@ -109,10 +113,10 @@ methods: {
 
     onSortChange(params) {
       this.updateParams({
-        sort: {
+        sort: [{
           type: params.sortType,
           field: this.columns[params.columnIndex].field,
-        },
+        }],
       });
       this.loadItems();
     },
@@ -140,7 +144,7 @@ methods: {
 1. Row object's update signifies to VGT that the loading event is now done, and VGT shows the new rows on the table. 
 
 ::: tip
-If you want to show loading notification manually, you can do so using table's `:isLoading=true` property.
+If you want to show loading notification manually, you can do so using table's `:isLoading.sync="isLoading"` property.
 :::
 
 ::: tip

@@ -34,7 +34,7 @@
       <select v-if="isDropdownObjects(column)"
         class="vgt-select"
         :value="columnFilters[column.field]"
-        v-on:input="updateFilters(column, $event.target.value, true)">
+        @change="updateFilters(column, $event.target.value, true)">
         <option value="" key="-1">{{ getPlaceholder(column) }}</option>
         <option
           v-for="(option, i) in column.filterOptions.filterDropdownItems"
@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import isEqual from 'lodash.isequal';
+
 export default {
   name: 'VgtFilterRow',
   props: [
@@ -59,10 +61,11 @@ export default {
   ],
   watch: {
     columns: {
-      handler() {
+      handler(newValue, oldValue) {
         this.populateInitialFilters();
       },
       deep: true,
+      immediate: true,
     },
   },
   data() {
@@ -155,15 +158,14 @@ export default {
         if (this.isFilterable(col)
           && typeof col.filterOptions.filterValue !== 'undefined'
           && col.filterOptions.filterValue !== null) {
-          this.updateFiltersImmediately(col, col.filterOptions.filterValue);
-          this.$set(col.filterOptions, 'filterValue', undefined);
+          this.$set(this.columnFilters, col.field, col.filterOptions.filterValue);
+          // this.updateFilters(col, col.filterOptions.filterValue);
+          // this.$set(col.filterOptions, 'filterValue', undefined);
         }
       }
+      //* lets emit event once all filters are set
+      this.$emit('filter-changed', this.columnFilters);
     },
-  },
-  mounted() {
-    // take care of initial filters
-    this.populateInitialFilters();
   },
 };
 </script>

@@ -6,26 +6,30 @@ export default {
   format(x) {
     return x;
   },
-  filterPredicate(rowval, filter) {
+  filterPredicate(rowval, filter, skipDiacritics = false, fromDropdown = false) {
     // take care of nulls
     if (typeof rowval === 'undefined' || rowval === null) {
       return false;
     }
 
     // row value
-    const rowValue = diacriticless(String(rowval).toLowerCase());
+    const rowValue = skipDiacritics
+      ? String(rowval).toLowerCase()
+      : diacriticless(escapeRegExp(String(rowval)).toLowerCase());
 
     // search term
-    const searchTerm = diacriticless(escapeRegExp(filter).toLowerCase());
+    const searchTerm = skipDiacritics
+      ? filter.toLowerCase()
+      : diacriticless(escapeRegExp(filter).toLowerCase());
 
     // comparison
-    return (rowValue.search(searchTerm) > -1);
+    return fromDropdown ? rowValue === searchTerm : (rowValue.indexOf(searchTerm) > -1);
   },
 
   compare(x, y) {
     function cook(d) {
       if (typeof d === 'undefined' || d === null) return '';
-      return d.toLowerCase();
+      return diacriticless(d.toLowerCase());
     }
     x = cook(x);
     y = cook(y);

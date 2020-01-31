@@ -1,75 +1,76 @@
 <template>
   <div>
+    {{ selectedIds }}
     <button @click="rows = [];">empty row</button>
     <button @click="resetTable">reset Table</button>
     <button @click="hideColumn">hide column</button>
     <button @click="setFilter">SetFilter</button>
+    <button @click="changePage">Change Page</button>
     <input type="text" v-model="searchTerm">
     <vue-good-table
       ref="my-table"
       @on-column-filter="onColumnFilter"
-      @on-row-dblclick="onColumnFilter"
       @on-select-all="onSelectAll"
       @on-sort-change="onSortChange"
       @on-page-change="onPageChange"
+      @on-per-page-change="onPerPageChange"
       @on-search="onSearch"
+      @on-selected-rows-change="onSelectChanged"
       :columns="columns"
       :rows="rows"
-      theme="black-rhino"
-      :line-numbers="true"
-      :pagination-options="{
-        mode: 'pages',
-        perPage: 3,
-        enabled: true,
-      }"
+      :pagination-options="paginationOptions"
       :select-options="{
-        enabled: false,
+        enabled: true,
         selectOnCheckboxOnly: false,
+        disableSelectInfo: true,
       }"
-      :rowStyleClass="getRowStyle"
+      theme="nocturnal"
       styleClass="vgt-table bordered"
       :sort-options="{
         enabled: true,
-        initialSortBy: [
-          {field: 'name', type: 'asc'},
-          {field: 'age', type: 'desc'}
-        ],
+        initialSortBy: [{field: 'name', type: 'asc'}],
       }"
       :search-options="{
         enabled: true,
+        skipDiacritics: true,
         externalQuery: searchTerm,
       }">
-      <template slot="table-column" slot-scope="props">
-        <span v-if="props.column.label =='Name'">
-            hi {{props.column.label}}
-        </span>
-        <span v-else>
-            {{props.column.label}}
-        </span>
-      </template>
     </vue-good-table>
+    <h3>Remote Table</h3>
+    <remote-table/>
     <h3>Grouped Table</h3>
-    <grouped-table></grouped-table>
+    <!-- <grouped-table></grouped-table> -->
   </div>
 </template>
 
 <script>
-import GroupedTable from './grouped-table';
+import GroupedTable from './grouped-table.vue';
+import RemoteTable from './remote-table.vue';
 
 export default {
   name: 'test',
   data() {
     return {
+      currentPage: 1,
+      selectedIds: [],
+      rowStyleClass: 'red',
       searchTerm: '',
+      paginationOptions: {
+        mode: 'pages',
+        enabled: true,
+        perPage: 5,
+        perPageDropdown: [50, 100, 200, 300, 500, 1000],
+      },
       columns: [
         {
           label: 'Name',
           field: 'name',
-          tdClass: this.tdClassFunc,
+          width: '200px',
           filterOptions: {
             enabled: true,
             placeholder: 'All',
-            filterDropdownItems: ['Chris', 'Dan', 'Susan'],
+            // filterDropdownItems: ['Chris', 'Dan', 'Susan'],
+            // filterValue: 'Chris',
           },
         },
         {
@@ -78,19 +79,38 @@ export default {
           type: 'number',
           filterOptions: {
             enabled: true,
+            filterDropdownItems: [
+              {
+                value: 24,
+                text: '24',
+              },
+              {
+                value: 16,
+                text: '16',
+              },
+            ],
           },
         },
         {
+          filterOptions: {
+            enabled: true,
+          },
+          sortable: false,
           label: 'Created On',
           field: 'createdAt',
           type: 'date',
-          dateInputFormat: 'YYYY-MM-DD',
-          dateOutputFormat: 'LLL',
+          dateInputFormat: 'yyyy-MM-dd',
+          dateOutputFormat: 'PPPP',
         },
         {
           label: 'Percent',
           field: 'score',
           type: 'percentage',
+        },
+        {
+          label: 'func',
+          field: this.funcValue,
+          type: 'number',
         },
         {
           label: 'Valid',
@@ -104,6 +124,17 @@ export default {
             ],
           },
         },
+        {
+          label: 'Exact',
+          field: 'exact',
+          filterOptions: {
+            enabled: true,
+            filterDropdownItems: [
+              'match',
+              'rematch',
+            ],
+          },
+        },
       ],
       rows: [
         // { id:1, name:"John", age: 20, createdAt: '2018-02-18T00:00:43-05:00',score: 0.03343 },
@@ -114,14 +145,16 @@ export default {
           createdAt: '2011-10-31',
           score: 0.03343,
           bool: true,
+          exact: 'match',
         },
         {
           id: 3,
-          name: 'Susan',
+          name: 'Angel',
           age: 16,
           createdAt: '2011-10-30',
           score: 0.03343,
           bool: true,
+          exact: 'match',
         },
         {
           id: 4,
@@ -130,14 +163,34 @@ export default {
           createdAt: '2011-10-11',
           score: 0.03343,
           bool: false,
+          exact: null,
         },
         {
           id: 5,
           name: 'Dan',
           age: 40,
+          createdAt: '',
+          score: 0.03343,
+          bool: null,
+          exact: 'rematch',
+        },
+        {
+          id: 5,
+          name: '193.23',
+          age: 20,
           createdAt: null,
           score: 0.03343,
           bool: null,
+          exact: 'rematch',
+        },
+        {
+          id: 5,
+          name: 'Dan',
+          age: 34,
+          createdAt: null,
+          score: 0.03343,
+          bool: null,
+          exact: null,
         },
         {
           id: 6,
@@ -146,14 +199,16 @@ export default {
           createdAt: '2011-10-31',
           score: 0.03343,
           bool: true,
+          exact: 'match',
         },
         {
           id: 7,
-          name: 'Jane',
+          name: 'Ángel',
           age: 20,
           createdAt: '2013-09-21',
           score: null,
           bool: 'false',
+          exact: null,
         },
         {
           id: 8,
@@ -162,11 +217,19 @@ export default {
           createdAt: '2013-10-31',
           score: 0.03343,
           bool: true,
+          exact: 'rematch',
         },
       ],
     };
   },
   methods: {
+    changePage() {
+      this.currentPage += 1;
+      this.$set(this.paginationOptions, 'setCurrentPage', this.currentPage);
+    },
+    funcValue(row) {
+      return row.age + 5;
+    },
     tdClassFunc(row) {
       if (row.age > 50) {
         return 'red';
@@ -215,11 +278,21 @@ export default {
       console.log(params);
     },
     setFilter() {
-      console.log('setting john');
       // this.columns[0].filterOptions.filterValue = 'John';
-      console.log(this.columns);
-      // this.$set(this.columns[0].filterOptions, 'filterValue', 'John');
-      this.$set(this.columns[1], 'filterOptions', { enabled: true, filterValue: 20 });
+      this.$set(this.columns[0].filterOptions, 'filterValue', 'Chris');
+      // const column1 = JSON.parse(JSON.stringify(this.columns[0]));
+      // column1.filterOptions.filterValue = 'John';
+      // this.$set(this.columns, 0, column1);
+      // const column2 = JSON.parse(JSON.stringify(this.columns[1]));
+      // column2.filterOptions.filterValue = 20;
+      // this.$set(this.columns, 1, column2);
+      // this.$set(this.columns[1], 'filterOptions', { enabled: true, filterValue: 20 });
+      // this.$set(this.columns[0], 'filterOptions', {
+      //   enabled: true,
+      //   placeholder: 'All',
+      //   filterDropdownItems: ['Chris', 'Dan', 'Susan', 'John'],
+      //   filterValue: 'John',
+      // });
     },
     autofilter(type) {
       if (type === 'name') {
@@ -247,6 +320,7 @@ export default {
 
     onClick() {
       console.log('clicked');
+      this.rowStyleClass = 'green';
     },
     addRow() {
       this.rows.push({
@@ -302,11 +376,24 @@ export default {
     onSortChange(params) {
       console.log('on-sort-change:');
       console.log(params);
+      const [nameFilter] = params;
+      console.log(typeof nameFilter.field === 'function');
     },
 
     onRowClick(params) {
       console.log('on-row-click');
       console.log(params);
+    },
+
+    onSelectChanged(params) {
+      console.log(params);
+      const selectedIds = params.selectedRows.reduce((acc, row) => {
+        acc.push(row.id);
+        return acc;
+      }, []);
+      console.log(params.selectedRows);
+      console.log(selectedIds);
+      this.selectedIds = selectedIds;
     },
   },
   mounted() {
@@ -318,6 +405,7 @@ export default {
   },
   components: {
     'grouped-table': GroupedTable,
+    RemoteTable,
   },
 };
 </script>
@@ -339,4 +427,3 @@ export default {
     background: red;
   } */
 </style>
-

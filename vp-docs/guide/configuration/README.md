@@ -37,6 +37,7 @@ Array containing row objects. Each row object contains data that will be display
     //...
 ]
 ```
+
 ::: tip
 for **grouped rows**, you need a nested format. Refer to [Grouped Table](/guide/advanced/grouped-table.md) for examples.
 :::
@@ -74,7 +75,7 @@ Fixed header should probably be used with max-height
 :::
 
 
-## lineNumbers
+## line-numbers
 
 type: `Boolean (default: false)`
 Show line number for each row
@@ -82,12 +83,12 @@ Show line number for each row
 <vue-good-table
   :columns="columns"
   :rows="rows"
-  :lineNumbers="true">
+  :line-numbers="true">
 </vue-good-table>
 ```
 <line-numbers-table />
 
-## rowStyleClass 
+## row-style-class 
 
 type: `String` or `Function`
 
@@ -97,7 +98,7 @@ property to assign a class to rows. This can either be a string representing a c
 <vue-good-table
   :columns="columns"
   :rows="rows"
-  :rowStyleClass="rowStyleClassFn">
+  :row-style-class="rowStyleClassFn">
 </vue-good-table>
 ```
 
@@ -143,6 +144,20 @@ You don't have to have global search enabled to use this slot.
 <action-slot-table />
 
 
+## Table Actions Footer Slot
+
+If you want a space for your buttons between pagination and the table. This is the slot you use. 
+
+```html
+<vue-good-table
+  :columns="columns"
+  :rows="rows">
+  <div slot="table-actions-bottom">
+    This will show up on the bottom of the table. 
+  </div>
+</vue-good-table>
+```
+
 ## Empty state slot
 You can provide html for empty state slot as well. Example:
 
@@ -179,4 +194,4 @@ type: `Number`
 totalRecords is only useful for remote mode. When server controls pagination the table needs to know how many total rows exist.
 :::
 
-total number of rows that exist given a table/filter. refer to [remote workflow]() for more details
+total number of rows that exist given a table/filter. refer to [remote workflow](/guide/advanced/remote-workflow.md) for more details

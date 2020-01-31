@@ -1,5 +1,5 @@
 import { format, parse, isValid, compareAsc } from 'date-fns';
-import clone from 'lodash.clone';
+import clone from 'lodash.clonedeep';
 import def from './default';
 
 const date = clone(def);
@@ -28,7 +28,11 @@ date.format = function (v, column) {
   if (v === undefined || v === null) return '';
   // convert to date
   const date = parse(v, column.dateInputFormat, new Date());
-  return format(date, column.dateOutputFormat);
+  if (isValid(date)) {
+    return format(date, column.dateOutputFormat);
+  }
+  console.error(`Not a valid date: "${v}"`);
+  return null;
 };
 
 export default date;
